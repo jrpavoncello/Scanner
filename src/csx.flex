@@ -86,6 +86,21 @@ class CSXErrorToken extends CSXToken
 	}
 }
 
+class CSXEOFToken extends CSXToken
+{
+	String error;
+	CSXEOFToken(int line, int col)
+	{
+		super(line, col);
+	}
+	
+	CSXEOFToken(String errorMessage, Position p)
+	{
+		super(p);
+		error = errorMessage;
+	}
+}
+
 // This class is used to track line and column numbers
 // Feel free to change to extend it
 class Position
@@ -149,7 +164,16 @@ ANYTHING = [^\Z]
 %type Symbol
 
 %eofval{
-  return new Symbol(sym.EOF, new CSXToken(0,0));
+
+	CSXEOFToken token = new CSXEOFToken(0,0);
+	
+	if(yystate() == FoundIncOrDec)
+	{
+		token.error = "Could not find identifier after Increment or Decrement before end of file.";
+	}
+	
+	return new Symbol(sym.EOF, token);
+	
 %eofval}
 
 %{
