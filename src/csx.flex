@@ -110,8 +110,34 @@ class Symbol {
 
 %%
 
-DIGIT=[0-9]
+
+
+
+
+INTLIT = [0-9]+
+
+FLOATLIT = {FL1}|{FL2}|{FL3}
+FL1    = {DIGIT}* \. {DIGIT}*
+FL2    = \. {DIGIT}+
+FL3    = {DIGIT}+
+
+NOTEQ = "!="
+LEQ = "<"
+
+RBRACKET = \[[\]
+LBRACKET = \[]\]
+
+
+PLUS = [+]
+TIMES = [*]
+
+CHARLIT = \"(\\.|[^\"])*\"
+IDENTIFIER = [a-z]+
+
+
+DIGIT = [0-9]
 STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\)*\"		// to be fixed
+
 
 %type Symbol
 %eofval{
