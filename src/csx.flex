@@ -154,6 +154,7 @@ FALSE = [fF][aA][lL][sS][eE]
 TRUE = [tT][rR][uU][eE]
 VOID = [vV][oO][iI][dD]
 PRINT = [pP][rR][iI][nN][tT]
+IF = [iI][fF]
 
 RESERVED_WORD = {FLOAT}|{WHILE}|{BOOL}|{CONTINUE}|{FALSE}|{TRUE}|{VOID}|{PRINT}
 ANYTHING = [^\Z]
@@ -319,6 +320,14 @@ Position Pos = new Position();
 		new CSXToken(Pos));
 }
 
+{IF}
+{
+	Pos.setpos();
+	Pos.col = yytext().length();
+	return new Symbol(sym.rw_IF,
+		new CSXToken(Pos));
+}
+
 <FoundIncOrDec> {RESERVED_WORD}
 {
 	Pos.setpos();
@@ -350,14 +359,6 @@ Position Pos = new Position();
 	Pos.setpos();
 	Pos.col = yytext().length();
 	return new Symbol(sym.RBRACKET,
-		new CSXToken(Pos));
-}
-
-if
-{
-	Pos.setpos();
-	Pos.col = yytext().length();
-	return new Symbol(sym.rw_IF,
 		new CSXToken(Pos));
 }
 
