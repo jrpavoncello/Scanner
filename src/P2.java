@@ -24,7 +24,7 @@ class P2 {
 	final Yylex lex = new Yylex(yyin);	
 
 	System.out.println ("Begin test of CSX scanner.");
-
+	
 	/**********************************************
 	
 	You should enter code here that thoroughly tests your scanner.
@@ -43,6 +43,87 @@ class P2 {
 		System.out.print( token.value.linenum + ":"
 				+ token.value.colnum + " ");
 		switch (token.sym) {
+		case sym.STRLIT:
+			System.out.println("\tstring literal(" +
+					((CSXStringLitToken) token.value).stringValue + ")");
+			break;
+			
+		case sym.rw_FLOAT:
+			System.out.println("\tfloat");
+			break;
+			
+		case sym.rw_WHILE:
+			System.out.println("\twhile");
+			break;
+			
+		case sym.rw_BOOL:
+			System.out.println("\tbool");
+			break;
+			
+		case sym.LBRACKET:
+			System.out.println("\t[");
+			break;
+			
+		case sym.RBRACKET:
+			System.out.println("\t]");
+			break;
+			
+		case sym.rw_IF:
+			System.out.println("\tif");
+			break;
+			
+		case sym.SLASH:
+			System.out.println("\t/");
+			break;
+			
+		case sym.rw_CONTINUE:
+			System.out.println("\tcontinue");
+			break;
+			
+		case sym.rw_FALSE:
+			System.out.println("\tfalse");
+			break;
+			
+		case sym.LPAREN:
+			System.out.println("\t(");
+			break;
+			
+		case sym.RPAREN:
+			System.out.println("\t)");
+			break;
+			
+		case sym.SEMI:
+			System.out.println("\t;");
+			break;
+			
+		case sym.rw_TRUE:
+			System.out.println("\ttrue");
+			break;
+			
+		case sym.rw_PRINT:
+			System.out.println("\tprint");
+			break;
+			
+		case sym.MINUS:
+			System.out.println("\t-");
+			break;
+			
+		case sym.NOT:
+			System.out.println("\t!");
+			break;
+			
+		case sym.INC:
+			System.out.println("\t++");
+			break;
+			
+		case sym.DEC:
+			System.out.println("\t--");
+			break;
+			
+		case sym.rw_VOID:
+			System.out.println("\tvoid");
+			break;
+			
 		case sym.INTLIT:
 			System.out.println("\tinteger literal(" +
 				((CSXIntLitToken) token.value).intValue + ")");
@@ -54,6 +135,16 @@ class P2 {
 
 		case sym.NOTEQ:
 			System.out.println("\t!=");
+			break;
+
+		case sym.IDENTIFIER:
+			System.out.println("\tidentifier (" +
+				((CSXIdentifierToken) token.value).identifierValue + ")");
+			break;
+
+		case sym.error:
+			System.out.println("\terror (" +
+				((CSXErrorToken) token.value).error + ")");
 			break;
 
 		default:
