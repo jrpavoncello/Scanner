@@ -424,7 +424,7 @@ Position Pos = new Position();
 
 <FoundIncOrDec> {IDENTIFIER}
 {
-	yybegin(FoundIdentifier);
+	yybegin(YYINITIAL);
 	Pos.setpos(); 
 	Pos.col += yytext().length();
 	
