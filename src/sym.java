@@ -55,6 +55,6 @@ public class sym {
   public static final int DEC = 31;
   public static final int GT = 19;
   public static final int NOTEQ = 21;
-  public static final int IDENTIFIER = 2; //
+  public static final int IDENTIFIER = 2;
 }
 
