@@ -235,14 +235,6 @@ class P2
             } // switch(token.sym)
             token = lex.yylex(); // get next token
         } // not at EOF
-        
-        CSXEOFToken eofToken = (CSXEOFToken)token.value;
-        
-        if(eofToken.error != null && !eofToken.error.equals(""))
-        {
-            System.out.println("State was not final by the end of file, error: " + eofToken.error);
-        }
-        
         System.out.println("End test of CSX scanner.");
     } // main()
     

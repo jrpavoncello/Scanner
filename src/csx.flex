@@ -84,21 +84,6 @@ class CSXErrorToken extends CSXToken
 	}
 }
 
-class CSXEOFToken extends CSXToken
-{
-	String error;
-	CSXEOFToken(int line, int col)
-	{
-		super(line, col);
-	}
-
-	CSXEOFToken(String errorMessage, Position p)
-	{
-		super(p);
-		error = errorMessage;
-	}
-}
-
 // This class is used to track line and column numbers
 // Feel free to change to extend it
 class Position
@@ -171,21 +156,12 @@ RESERVED_WORD = {FLOAT}|{WHILE}|{BOOL}|{CONTINUE}|{FALSE}|{TRUE}|{VOID}|{PRINT}|
 ANYTHING = [^\Z]
 
 %states FoundIdentifier
-%xstates FoundIncOrDec
+%xstates FoundIncOrDec, FoundIdentifierMatch
 
 %type Symbol
 
 %eofval{
-
-CSXEOFToken token = new CSXEOFToken(0,0);
-
-if(yystate() == FoundIncOrDec)
-{
-	token.error = "Could not find identifier after Increment or Decrement before end of file.";
-}
-
-return new Symbol(sym.EOF, token);
-
+	return new Symbol(sym.EOF, new CSXToken(0,0));
 %eofval}
 
 %{
@@ -238,13 +214,31 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXToken(Pos));
 }
 
-"++"
+"++" / {RESERVED_WORD}
 {
-	yybegin(FoundIncOrDec);
+	yybegin(YYINITIAL);
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Found reserved word after \"++\" operator", Pos));
+}
+
+"++" / {IDENTIFIER}
+{
+	yybegin(FoundIdentifierMatch);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.INC,
 			new CSXToken(Pos));
+}
+
+"++"
+{
+	yybegin(YYINITIAL);
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Could not find matching identifier for \"++\" operator", Pos));
 }
 
 <FoundIdentifier> "--"
@@ -256,13 +250,31 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXToken(Pos));
 }
 
-"--"
+"--" / {RESERVED_WORD}
 {
-	yybegin(FoundIncOrDec);
+	yybegin(YYINITIAL);
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Found reserved word after \"--\" operator", Pos));
+}
+
+"--" / {IDENTIFIER}
+{
+	yybegin(FoundIdentifierMatch);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.DEC,
 			new CSXToken(Pos));
+}
+
+"--"
+{
+	yybegin(YYINITIAL);
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Could not find matching identifier for \"--\" operator", Pos));
 }
 
 "="
@@ -596,18 +608,19 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXErrorToken("Found reserved word '" +  yytext() + "' after an Increment or Decrement operator, expected an identifier.", Pos));
 }
 
-<FoundIncOrDec> {ANYTHING}
-{
-	Pos.setpos();
-	Pos.col += yytext().length();
-	yybegin(YYINITIAL);
-	return new Symbol(sym.error,
-			new CSXErrorToken("Found something other than an identifier after an Increment or Decrement operator", Pos));
-}
-
 <FoundIncOrDec> {IDENTIFIER}
 {
 	yybegin(FoundIdentifier);
+	Pos.setpos();
+	Pos.col += yytext().length();
+
+	return new Symbol(sym.IDENTIFIER,
+			new CSXIdentifierToken(yytext(), Pos));
+}
+
+<FoundIdentifierMatch> {IDENTIFIER}
+{
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 
