@@ -1,9 +1,6 @@
 class test {
-## sample test case for Program #2 (scanner) --
-   may not parse,  type-check or execute
-   correctly ##
 
-int i = 0 ## init to 0##;
+int i = 0;
 int j = ~123;
 int bigPos = 11111111111111111111111111111111111111;
 int bigNeg = ~2222222222222222222222222222222222222;
@@ -17,8 +14,8 @@ char tic = '\'';
 CONST ten = 10;
 int ar[100];
 
-void p(INT j) {##
-	##print("Ans = ", j+1, "\n");
+void p(INT j) {
+	print("Ans = ", j+1, "\n");
 }
 
 int f(int i){

@@ -126,7 +126,7 @@ BLOCKCOMMENT = [#][#]([#]|[^#])*?[#][#]
 SINGLELINECOMMENT = [/][/].*[\n\r]?
 
 DIGIT=[0-9]
-STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\)*\"		// to be fixed
+STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\|" ")*\"		// to be fixed
 IDENTIFIER = ([a-zA-Z][_0-9]?)+
 FLOAT = [fF][lL][oO][aA][tT]
 WHILE = [wW][hH][iI][lL][eE]
@@ -458,15 +458,57 @@ new CSXToken(Pos));
 			new CSXCharLitToken(yycharat(Pos.col), Pos));
 }
 
+[~]?{DIGIT}*\.{DIGIT}+
+{
+	Pos.setpos();
+	String parsedString = yytext();
+	Pos.col += parsedString.length();
+	parsedString = parsedString.replace('~', '-');
+	try{
+		return new Symbol(sym.FLOATLIT,
+				new CSXFloatLitToken(Float.parseFloat(parsedString), Pos));
+
+	} catch (NumberFormatException e) {
+
+		System.out.println("Overflow Error");
+		System.out.println(e.getMessage());
+
+		return new Symbol(sym.FLOATLIT,
+				new CSXFloatLitToken(Float.MAX_VALUE, Pos));
+	}
+}
+
+[~]?{DIGIT}*\.{DIGIT}+
+{
+	Pos.setpos();
+	String parsedString = yytext();
+	Pos.col += parsedString.length();
+	parsedString = parsedString.replace('~', '-');
+	try{
+		return new Symbol(sym.FLOATLIT,
+				new CSXFloatLitToken(Float.parseFloat(parsedString), Pos));
+
+	} catch (NumberFormatException e) {
+
+		System.out.println("Overflow Error");
+		System.out.println(e.getMessage());
+
+		return new Symbol(sym.FLOATLIT,
+				new CSXFloatLitToken(Float.MAX_VALUE, Pos));
+	}
+}
+
 [~]?{DIGIT}+
 {
-  
 	Pos.setpos();
-	Pos.col += yytext().length();
+	
+	String parsedString = yytext();
+	Pos.col += parsedString.length();
+	parsedString = parsedString.replace('~', '-');
 
 	try{
 		return new Symbol(sym.INTLIT,
-				new CSXIntLitToken(Integer.parseInt(yytext()), Pos));
+				new CSXIntLitToken(Integer.parseInt(parsedString), Pos));
 
 	} catch (NumberFormatException e) {
 
