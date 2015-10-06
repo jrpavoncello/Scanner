@@ -122,8 +122,8 @@ class Symbol
 
 %%
 
-BLOCKCOMMENT = [#][#]{ANYTHING}+[#][#]
-SINGLELINECOMMENT = [/][/]{ANYTHING}+[$]
+BLOCKCOMMENT = [#][#]([#]|[^#])*?[#][#]
+SINGLELINECOMMENT = [/][/](.)*([\n\r]|<<EOF>>)
 
 DIGIT=[0-9]
 STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\)*\"		// to be fixed
@@ -142,7 +142,6 @@ BREAK = [Bb][Rr][Ee][Aa][Kk]
 CHAR = [Cc][Hh][Aa][Rr]
 
 CHARLIT = [']([a-zA-Z]|([\\][nNtTrR\'\"\\]))[']
-
 RETURN = [Rr][Ee][Tt][Uu][Rr][Nn]
 CLASS = [Cc][Ll][Aa][Ss][Ss]
 INT = [Ii][Nn][Tt]
@@ -195,6 +194,43 @@ Tokens for the CSX language are defined here using regular expressions
 	Pos.col += yytext().length();
 	return new Symbol(sym.EQ,
 			new CSXToken(Pos));
+}
+
+">"
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.GT,
+new CSXToken(Pos));
+}
+"<"
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.LT,
+new CSXToken(Pos));
+}
+
+"<="
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.LEQ,
+new CSXToken(Pos));
+}
+
+"\'"
+{
+Pos.setpos();
+Pos.col += yytext().length();
+}
+
+">="
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.GEQ,
+new CSXToken(Pos));
 }
 
 "!="
@@ -275,6 +311,14 @@ Tokens for the CSX language are defined here using regular expressions
 	Pos.col += yytext().length();
 	return new Symbol(sym.error,
 			new CSXErrorToken("Could not find matching identifier for \"--\" operator", Pos));
+}
+
+"*"
+{
+Pos.setpos();
+Pos.col = yytext().length();
+return new Symbol(sym.TIMES,
+new CSXToken(Pos));
 }
 
 "="
@@ -391,22 +435,18 @@ Tokens for the CSX language are defined here using regular expressions
 
 {SINGLELINECOMMENT}
 {
-	Pos.setpos();
-	Pos.col += yytext().length();
+    System.out.println(yytext());
+    Pos.setpos();
+    Pos.col += yytext().length();
 
-	return new Symbol(sym.LT,
-			new CSXStringLitToken(yytext(), Pos));	
 }
 
 {BLOCKCOMMENT}
 {
+    System.out.println(yytext());
 	Pos.setpos();
 	Pos.col += yytext().length();
-
-	return new Symbol(sym.GT,
-			new CSXStringLitToken(yytext(), Pos));
 }
-
 
 
 {CHARLIT}
@@ -418,8 +458,15 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXCharLitToken(yycharat(Pos.col), Pos));
 }
 
-{DIGIT}+
+[~]?{DIGIT}+
 {
+  //  BOOL negFlag = False;
+
+   // if(yycharat(Pos.col)){
+
+
+//    }
+
 	Pos.setpos();
 	Pos.col += yytext().length();
 
@@ -452,6 +499,12 @@ Tokens for the CSX language are defined here using regular expressions
 	Pos.col += 1;
 }
 
+\t
+{
+    yybegin(YYINITIAL);
+    Pos.col = 4;
+
+}
 \n|(\r\n)
 {
 	yybegin(YYINITIAL);

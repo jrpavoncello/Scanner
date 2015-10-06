@@ -165,6 +165,10 @@ class P2
                     System.out.println("\t!");
                     break;
                     
+                case sym.TIMES:
+                    System.out.println("\t*");
+                    break;
+                    
                 case sym.INC:
                     System.out.println("\t++");
                     break;
@@ -216,14 +220,20 @@ class P2
                     break;
                     
                 case sym.GT:
-                    System.out.println("\tblock comment (" +
-                                       ((CSXStringLitToken) token.value).stringValue + ")");
+                    System.out.println("\t>");
                     break;
                     
                 case sym.LT:
-                    System.out.println("\tline comment (" +
-                                       ((CSXStringLitToken) token.value).stringValue + ")");
+                    System.out.println("\t<" );
+                    
+                case sym.GEQ:
+                    System.out.println("\t>=");
                     break;
+                    
+                case sym.LEQ:
+                    System.out.println("\t<=");
+                    break;
+
                     
                 case sym.error:
                     System.out.println("\terror (" +
