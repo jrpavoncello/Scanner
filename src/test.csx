@@ -41,7 +41,7 @@ L: while (i != 0) {
 	++i;
 	i++;
 }
-
+/// Soheghw byrb*(&^%$%^&*() (&*^%$# _)(*&^%$3hnrqekubgr9
 if (i == 10 || i < 21 || i > ~17 || i != 123) {
 	Print( i);
 	p(17);

@@ -123,7 +123,7 @@ class Symbol
 %%
 
 BLOCKCOMMENT = [#][#]([#]|[^#])*?[#][#]
-SINGLELINECOMMENT = [/][/](.)*([\n\r]|<<EOF>>)
+SINGLELINECOMMENT = [/][/].*[\n\r]?
 
 DIGIT=[0-9]
 STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\)*\"		// to be fixed
@@ -460,13 +460,7 @@ new CSXToken(Pos));
 
 [~]?{DIGIT}+
 {
-  //  BOOL negFlag = False;
-
-   // if(yycharat(Pos.col)){
-
-
-//    }
-
+  
 	Pos.setpos();
 	Pos.col += yytext().length();
 
