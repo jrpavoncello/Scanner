@@ -1,3 +1,11 @@
+## ##
+
+#####
+
+### ##
+
+###
+##
 class test {
 
 ## some
@@ -17,9 +25,11 @@ char bslash = '\\';
 char tic = '\'';
 CONST ten = 10;
 int ar[100];
-## ##
+###1##
 
 ##
+
+
 
 aefs#34r%^%$#
 ##
@@ -60,3 +70,6 @@ if (i >= f(~3) || i <= f(i-1))
 	print( i , f(i) , "\n");
 
 } // That's all folks
+
+##345##
+##345##

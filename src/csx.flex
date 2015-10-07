@@ -122,7 +122,7 @@ class Symbol
 
 %%
 
-BLOCKCOMMENT = ##((#[^#])?[^#]?)*##
+BLOCKCOMMENT = ##(((#[^#])?[^#]?)*|#)##
 SINGLELINECOMMENT = [/][/].*[\n\r]?
 
 DIGIT=[0-9]
