@@ -17,7 +17,16 @@ char bslash = '\\';
 char tic = '\'';
 CONST ten = 10;
 int ar[100];
+## ##
 
+##
+
+aefs#34r%^%$#
+##
+
+##345##
+
+####
 void p(INT j) {
 
 }
