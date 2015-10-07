@@ -198,6 +198,11 @@ class P2
                                        ((CSXIntLitToken) token.value).intValue + ")");
                     break;
                     
+                case sym.FLOATLIT:
+                    System.out.println("\tfloat literal(" +
+                                       ((CSXFloatLitToken) token.value).floatValue + ")");
+                    break;
+                    
                 case sym.PLUS:
                     System.out.println("\t+");
                     break;
@@ -225,6 +230,7 @@ class P2
                     
                 case sym.LT:
                     System.out.println("\t<" );
+                    break;
                     
                 case sym.GEQ:
                     System.out.println("\t>=");
@@ -234,7 +240,6 @@ class P2
                     System.out.println("\t<=");
                     break;
 
-                    
                 case sym.error:
                     System.out.println("\terror (" +
                                        ((CSXErrorToken) token.value).error + ")");

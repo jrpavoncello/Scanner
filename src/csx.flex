@@ -152,8 +152,6 @@ CONST = [Cc][Oo][Nn][Ss][Tt]
 
 RESERVED_WORD = {FLOAT}|{WHILE}|{BOOL}|{CONTINUE}|{FALSE}|{TRUE}|{VOID}|{PRINT}|{BREAK}|{CHAR}|{CLASS}|{RETURN}|{INT}|{READ}|{ELSE}|{CONST}|{IF}
 
-ANYTHING = [^\Z]
-
 %states FoundIdentifier
 %xstates FoundIncOrDec, FoundIdentifierMatch
 
@@ -196,41 +194,20 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXToken(Pos));
 }
 
-">"
-{
-Pos.setpos();
-Pos.col += yytext().length();
-return new Symbol(sym.GT,
-new CSXToken(Pos));
-}
-"<"
-{
-Pos.setpos();
-Pos.col += yytext().length();
-return new Symbol(sym.LT,
-new CSXToken(Pos));
-}
-
 "<="
 {
-Pos.setpos();
-Pos.col += yytext().length();
-return new Symbol(sym.LEQ,
-new CSXToken(Pos));
-}
-
-"\'"
-{
-Pos.setpos();
-Pos.col += yytext().length();
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.LEQ,
+	new CSXToken(Pos));
 }
 
 ">="
 {
-Pos.setpos();
-Pos.col += yytext().length();
-return new Symbol(sym.GEQ,
-new CSXToken(Pos));
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.GEQ,
+	new CSXToken(Pos));
 }
 
 "!="
@@ -311,6 +288,28 @@ new CSXToken(Pos));
 	Pos.col += yytext().length();
 	return new Symbol(sym.error,
 			new CSXErrorToken("Could not find matching identifier for \"--\" operator", Pos));
+}
+
+">"
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.GT,
+new CSXToken(Pos));
+}
+
+"<"
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.LT,
+new CSXToken(Pos));
+}
+
+"\'"
+{
+Pos.setpos();
+Pos.col += yytext().length();
 }
 
 "*"
@@ -435,7 +434,6 @@ new CSXToken(Pos));
 
 {SINGLELINECOMMENT}
 {
-    System.out.println(yytext());
     Pos.setpos();
     Pos.col += yytext().length();
 
@@ -458,23 +456,25 @@ new CSXToken(Pos));
 			new CSXCharLitToken(yycharat(Pos.col), Pos));
 }
 
-[~]?{DIGIT}*\.{DIGIT}+
+[~]?{DIGIT}+\.{DIGIT}*
 {
 	Pos.setpos();
 	String parsedString = yytext();
 	Pos.col += parsedString.length();
 	parsedString = parsedString.replace('~', '-');
-	try{
-		return new Symbol(sym.FLOATLIT,
-				new CSXFloatLitToken(Float.parseFloat(parsedString), Pos));
-
-	} catch (NumberFormatException e) {
-
-		System.out.println("Overflow Error");
-		System.out.println(e.getMessage());
+	
+    float parsedFloat = Float.parseFloat(parsedString);
+    if(parsedFloat == Float.NEGATIVE_INFINITY || parsedFloat == Float.POSITIVE_INFINITY)
+    {
+		System.out.println("Float Overflow Error");
 
 		return new Symbol(sym.FLOATLIT,
 				new CSXFloatLitToken(Float.MAX_VALUE, Pos));
+    }
+    else
+    {
+		return new Symbol(sym.FLOATLIT,
+			new CSXFloatLitToken(parsedFloat, Pos));
 	}
 }
 
@@ -484,40 +484,31 @@ new CSXToken(Pos));
 	String parsedString = yytext();
 	Pos.col += parsedString.length();
 	parsedString = parsedString.replace('~', '-');
-	try{
-		return new Symbol(sym.FLOATLIT,
-				new CSXFloatLitToken(Float.parseFloat(parsedString), Pos));
-
-	} catch (NumberFormatException e) {
-
-		System.out.println("Overflow Error");
-		System.out.println(e.getMessage());
+	
+    float parsedFloat = Float.parseFloat(parsedString);
+    if(parsedFloat == Float.NEGATIVE_INFINITY || parsedFloat == Float.POSITIVE_INFINITY)
+    {
+		System.out.println("Float Overflow Error");
 
 		return new Symbol(sym.FLOATLIT,
 				new CSXFloatLitToken(Float.MAX_VALUE, Pos));
+    }
+    else
+    {
+		return new Symbol(sym.FLOATLIT,
+			new CSXFloatLitToken(parsedFloat, Pos));
 	}
 }
 
 [~]?{DIGIT}+
 {
 	Pos.setpos();
-	
 	String parsedString = yytext();
 	Pos.col += parsedString.length();
 	parsedString = parsedString.replace('~', '-');
-
-	try{
-		return new Symbol(sym.INTLIT,
-				new CSXIntLitToken(Integer.parseInt(parsedString), Pos));
-
-	} catch (NumberFormatException e) {
-
-		System.out.println("Overflow Error");
-		System.out.println(e.getMessage());
-
-		return new Symbol(sym.INTLIT,
-				new CSXIntLitToken(Integer.MAX_VALUE, Pos));
-	}
+	
+	return new Symbol(sym.FLOATLIT,
+			new CSXFloatLitToken(Float.parseFloat(parsedString), Pos));
 }
 
 {STRLIT}+
