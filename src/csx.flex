@@ -127,7 +127,10 @@ SINGLELINECOMMENT = [/][/].*[\n\r]?
 
 DIGIT=[0-9]
 STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\|" ")*\"		// to be fixed
+
 IDENTIFIER = ([a-zA-Z][_0-9]?)+
+ILLEGALIDENTIFIER = _?([0-9]*[a-zA-Z][_0-9]?)+
+
 FLOAT = [fF][lL][oO][aA][tT]
 WHILE = [wW][hH][iI][lL][eE]
 BOOL = [bB][oO][oO][lL]
@@ -709,6 +712,8 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXIdentifierToken(yytext(), Pos));
 }
 
+
+
 {IDENTIFIER}
 {
 	yybegin(FoundIdentifier);
@@ -717,6 +722,14 @@ Tokens for the CSX language are defined here using regular expressions
 
 	return new Symbol(sym.IDENTIFIER,
 			new CSXIdentifierToken(yytext(), Pos));
+}
+
+{ILLEGALIDENTIFIER}
+{
+Pos.setpos();
+Pos.col += yytext().length();
+return new Symbol(sym.error,
+new CSXErrorToken("Found invalid Identifier: " + yytext(), Pos));
 }
 
 [^\Z]
