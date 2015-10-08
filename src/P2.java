@@ -86,7 +86,8 @@ class P2
                     break;
                     
                 case sym.CHARLIT:
-                    System.out.println("\tcharlit");
+                    System.out.println("\tcharacter literal(" +
+                            ((CSXCharLitToken) token.value).charValue + ")");
                     break;
                     
                 case sym.rw_FLOAT:

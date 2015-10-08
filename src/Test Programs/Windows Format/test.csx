@@ -21,6 +21,20 @@ char tic = '\'';
 CONST ten = 10;
 int ar[100];
 
+###########
+
+##
+
+aefs#34r%^%$#
+##
+
+##345##
+
+####
+## ###
+
+##ij##jj##
+
 void p(INT j) {
 	print("Ans = ", j+1, "\n");
 }

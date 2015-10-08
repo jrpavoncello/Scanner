@@ -36,20 +36,20 @@ class CSXIntLitToken extends CSXToken
 class CSXFloatLitToken extends CSXToken
 {
 	float floatValue;
-	CSXFloatLitToken(float val, Position p)
+	CSXFloatLitToken(float floatValue, Position p)
 	{
 		super(p);
-		floatValue = val;
+		this.floatValue = floatValue;
 	}
 }
 
 class CSXIdentifierToken extends CSXToken
 {
 	String identifierValue;
-	CSXIdentifierToken(String val, Position p)
+	CSXIdentifierToken(String identifierValue, Position p)
 	{
 		super(p);
-		identifierValue = val;
+		this.identifierValue = identifierValue;
 	}
 
 }
@@ -57,30 +57,30 @@ class CSXIdentifierToken extends CSXToken
 class CSXCharLitToken extends CSXToken
 {
 	char charValue;
-	CSXCharLitToken(char val, Position p)
+	CSXCharLitToken(char charValue, Position p)
 	{
 		super(p);
-		charValue = val;
+		this.charValue = charValue;
 	}
 }
 
 class CSXStringLitToken extends CSXToken
 {
 	String stringValue;
-	CSXStringLitToken(String val, Position p)
+	CSXStringLitToken(String stringValue, Position p)
 	{
 		super(p);
-		stringValue = val;
+		this.stringValue = stringValue;
 	}
 }
 
 class CSXErrorToken extends CSXToken
 {
 	String error;
-	CSXErrorToken(String errorMessage, Position p)
+	CSXErrorToken(String error, Position p)
 	{
 		super(p);
-		error = errorMessage;
+		this.error = error;
 	}
 }
 
@@ -122,7 +122,7 @@ class Symbol
 
 %%
 
-BLOCKCOMMENT = ##(((#[^#])?[^#]?)*|#)##
+BLOCKCOMMENT = ##((#[^#])|[^#])*#?##
 SINGLELINECOMMENT = [/][/].*[\n\r]?
 
 DIGIT=[0-9]
@@ -198,24 +198,21 @@ Tokens for the CSX language are defined here using regular expressions
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.LEQ,
-	new CSXToken(Pos));
+	return new Symbol(sym.LEQ, new CSXToken(Pos));
 }
 
 ">="
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.GEQ,
-	new CSXToken(Pos));
+	return new Symbol(sym.GEQ, new CSXToken(Pos));
 }
 
 "!="
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.NOTEQ,
-			new CSXToken(Pos));
+	return new Symbol(sym.NOTEQ, new CSXToken(Pos));
 }
 
 <FoundIdentifier> "++"
@@ -223,8 +220,7 @@ Tokens for the CSX language are defined here using regular expressions
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.INC,
-			new CSXToken(Pos));
+	return new Symbol(sym.INC, new CSXToken(Pos));
 }
 
 "++" / {RESERVED_WORD}
@@ -241,8 +237,7 @@ Tokens for the CSX language are defined here using regular expressions
 	yybegin(FoundIdentifierMatch);
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.INC,
-			new CSXToken(Pos));
+	return new Symbol(sym.INC, new CSXToken(Pos));
 }
 
 "++"
@@ -259,8 +254,7 @@ Tokens for the CSX language are defined here using regular expressions
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.DEC,
-			new CSXToken(Pos));
+	return new Symbol(sym.DEC, new CSXToken(Pos));
 }
 
 "--" / {RESERVED_WORD}
@@ -277,8 +271,7 @@ Tokens for the CSX language are defined here using regular expressions
 	yybegin(FoundIdentifierMatch);
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.DEC,
-			new CSXToken(Pos));
+	return new Symbol(sym.DEC, new CSXToken(Pos));
 }
 
 "--"
@@ -292,193 +285,187 @@ Tokens for the CSX language are defined here using regular expressions
 
 ">"
 {
-Pos.setpos();
-Pos.col += yytext().length();
-return new Symbol(sym.GT,
-new CSXToken(Pos));
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.GT, new CSXToken(Pos));
 }
 
 "<"
 {
-Pos.setpos();
-Pos.col += yytext().length();
-return new Symbol(sym.LT,
-new CSXToken(Pos));
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.LT, new CSXToken(Pos));
 }
 
 "\'"
 {
-Pos.setpos();
-Pos.col += yytext().length();
+	Pos.setpos();
+	Pos.col += yytext().length();
 }
 
 "*"
 {
-Pos.setpos();
-Pos.col = yytext().length();
-return new Symbol(sym.TIMES,
-new CSXToken(Pos));
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.TIMES, new CSXToken(Pos));
 }
 
 "="
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.ASG,
-			new CSXToken(Pos));
+	return new Symbol(sym.ASG, new CSXToken(Pos));
 }
 
 "+"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.PLUS,
-			new CSXToken(Pos));
+	return new Symbol(sym.PLUS, new CSXToken(Pos));
 }
 
 "-"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.MINUS,
-			new CSXToken(Pos));
+	return new Symbol(sym.MINUS, new CSXToken(Pos));
 }
 
 "!"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.NOT,
-			new CSXToken(Pos));
+	return new Symbol(sym.NOT, new CSXToken(Pos));
 }
 
 ";"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.SEMI,
-			new CSXToken(Pos));
+	return new Symbol(sym.SEMI, new CSXToken(Pos));
 }
 
 ":"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.COLON,
-			new CSXToken(Pos));
+	return new Symbol(sym.COLON, new CSXToken(Pos));
 }
 
 ","
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.COMMA,
-			new CSXToken(Pos));
+	return new Symbol(sym.COMMA, new CSXToken(Pos));
 }
 
 "{"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.LBRACKET,
-			new CSXToken(Pos));
+	return new Symbol(sym.LBRACKET, new CSXToken(Pos));
 }
 
 "}"
 {
 	Pos.setpos();
-	Pos.col = yytext().length();
-	return new Symbol(sym.RBRACKET,
-			new CSXToken(Pos));
+	Pos.col += yytext().length();
+	return new Symbol(sym.RBRACKET, new CSXToken(Pos));
 }
 
 "["
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.LBRACE,
-			new CSXToken(Pos));
+	return new Symbol(sym.LBRACE, new CSXToken(Pos));
 }
 
 "]"
 {
 	Pos.setpos();
-	Pos.col = yytext().length();
-	return new Symbol(sym.RBRACE,
-			new CSXToken(Pos));
+	Pos.col += yytext().length();
+	return new Symbol(sym.RBRACE, new CSXToken(Pos));
 }
 
 "/"
 {
 	Pos.setpos();
-	Pos.col = yytext().length();
-	return new Symbol(sym.SLASH,
-			new CSXToken(Pos));
+	Pos.col += yytext().length();
+	return new Symbol(sym.SLASH, new CSXToken(Pos));
 }
 
 "("
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.LPAREN,
-			new CSXToken(Pos));
+	return new Symbol(sym.LPAREN, new CSXToken(Pos));
 }
 
 ")"
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
-	return new Symbol(sym.RPAREN,
-			new CSXToken(Pos));
+	return new Symbol(sym.RPAREN, new CSXToken(Pos));
 }
 
 {SINGLELINECOMMENT}
 {
+	String comment = yytext();
+    System.out.println("Line Comment: " + comment);
     Pos.setpos();
-    Pos.col += yytext().length();
-
+    Pos.col += comment.length();
 }
 
 {BLOCKCOMMENT}
 {
-    System.out.println(yytext());
 	Pos.setpos();
-	Pos.col += yytext().length();
+	
+    int rowsSkipped = 0;
+    String parseString = yytext();
+	for(int i = 0; i < parseString.length(); i++)
+	{
+		Pos.col++;
+		if(parseString.charAt(i) == '\n')
+		{
+			Pos.col=1;
+			Pos.line++;
+		}
+	}
+	
+    System.out.println("Block Comment: " + parseString);
 }
-
 
 {CHARLIT}
 {
 	Pos.setpos();
-	Pos.col += yytext().length();
+	String charString = yytext();
+	Pos.col += charString.length();
 
-	return new Symbol(sym.CHARLIT,
-			new CSXCharLitToken(yycharat(Pos.col), Pos));
-}
-
-[~]?{DIGIT}+\.{DIGIT}*
-{
-	Pos.setpos();
-	String parsedString = yytext();
-	Pos.col += parsedString.length();
-	parsedString = parsedString.replace('~', '-');
-	
-    float parsedFloat = Float.parseFloat(parsedString);
-    if(parsedFloat == Float.NEGATIVE_INFINITY || parsedFloat == Float.POSITIVE_INFINITY)
-    {
-		System.out.println("Float Overflow Error");
-
-		return new Symbol(sym.FLOATLIT,
-				new CSXFloatLitToken(Float.MAX_VALUE, Pos));
-    }
-    else
-    {
-		return new Symbol(sym.FLOATLIT,
-			new CSXFloatLitToken(parsedFloat, Pos));
+	char parsedChar;
+	switch(charString)
+	{
+		case "'\\n'":
+			parsedChar = '\n';
+			break;
+		case "'\\t'":
+			parsedChar = '\t';
+			break;
+		case "'\\\\'":
+			parsedChar = '\\';
+			break;
+		case "'\\''":
+			parsedChar = '\'';
+			break;
+		default:
+			parsedChar = charString.charAt(1);
+			break;
 	}
+	
+	return new Symbol(sym.CHARLIT,
+			new CSXCharLitToken(parsedChar, Pos));
 }
 
-[~]?{DIGIT}*\.{DIGIT}+
+([~]?{DIGIT}+\.{DIGIT}*)|([~]?{DIGIT}*\.{DIGIT}+)
 {
 	Pos.setpos();
 	String parsedString = yytext();
@@ -503,12 +490,23 @@ new CSXToken(Pos));
 [~]?{DIGIT}+
 {
 	Pos.setpos();
+	
 	String parsedString = yytext();
 	Pos.col += parsedString.length();
 	parsedString = parsedString.replace('~', '-');
-	
-	return new Symbol(sym.FLOATLIT,
-			new CSXFloatLitToken(Float.parseFloat(parsedString), Pos));
+
+	try{
+		return new Symbol(sym.INTLIT,
+				new CSXIntLitToken(Integer.parseInt(parsedString), Pos));
+
+	} catch (NumberFormatException e) {
+
+		System.out.println("Overflow Error");
+		System.out.println(e.getMessage());
+
+		return new Symbol(sym.INTLIT,
+				new CSXIntLitToken(Integer.MAX_VALUE, Pos));
+	}
 }
 
 {STRLIT}+
@@ -522,19 +520,22 @@ new CSXToken(Pos));
 
 " "
 {
+	Pos.setpos();
 	yybegin(YYINITIAL);
 	Pos.col += 1;
 }
 
 \t
 {
+	Pos.setpos();
     yybegin(YYINITIAL);
-    Pos.col = 4;
+    Pos.col += 1;
 
 }
 \n|(\r\n)
 {
 	yybegin(YYINITIAL);
+	Pos.setpos();
 	Pos.line += 1;
 	Pos.col = 1;
 }
@@ -634,7 +635,7 @@ new CSXToken(Pos));
 {CONTINUE}
 {
 	Pos.setpos();
-	Pos.col = yytext().length();
+	Pos.col += yytext().length();
 	return new Symbol(sym.rw_CONTINUE,
 			new CSXToken(Pos));
 }
@@ -674,7 +675,7 @@ new CSXToken(Pos));
 {IF}
 {
 	Pos.setpos();
-	Pos.col = yytext().length();
+	Pos.col += yytext().length();
 	return new Symbol(sym.rw_IF,
 			new CSXToken(Pos));
 }
@@ -716,4 +717,13 @@ new CSXToken(Pos));
 
 	return new Symbol(sym.IDENTIFIER,
 			new CSXIdentifierToken(yytext(), Pos));
+}
+
+[^\Z]
+{
+	yybegin(YYINITIAL);
+	Pos.setpos();
+	Pos.col += yytext().length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Found invalid token: " + yytext(), Pos));
 }
