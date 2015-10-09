@@ -106,8 +106,16 @@ CLASS forbos(REad(BOOL)){
 	 
 	 StRiNg RUNAWAY!!! = "Oh Noooo!!; It never ends!
 	 
-	 StrInG AnotherRunAway = "
 	 
+	 " SOME RUNNAWAY 4058939 weuh4 '
+	 
+	 
+	 ' SOME RUNNAWAY 4058939 weuh4 "
+	 
+	 
+	 StrInG AnotherRunAway = "
+	  char somechar = 'aoeihfgrun';
+	  
 	 char someNewRunAway= ' '
 	 
 	 char RUN!! = ''  |  '
@@ -177,3 +185,9 @@ var function(varz){
 	
 	
 }
+
+
+
+
+
+
