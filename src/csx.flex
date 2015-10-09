@@ -131,7 +131,7 @@ RUNSTRLIT = \"((\\[\\\"rnt]*)|[\040!#-\[\]-~])*
 STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\|" ")*\"		// to be fixed
 
 IDENTIFIER = ([a-zA-Z][_0-9]?)+
-ILLEGALIDENTIFIER = _?([0-9]*[a-zA-Z][_0-9]?)+
+ILLEGALIDENTIFIER = (_([0-9]*[a-zA-Z]+[_0-9]?)+)|([0-9]*[a-zA-Z]+[_0-9]?)
 
 FLOAT = [fF][lL][oO][aA][tT]
 WHILE = [wW][hH][iI][lL][eE]
@@ -155,7 +155,7 @@ INT = [Ii][Nn][Tt]
 READ = [Rr][Ee][Aa][Dd]
 ELSE = [Ee][Ll][Ss][Ee]
 CONST = [Cc][Oo][Nn][Ss][Tt]
-
+FOR = 
 
 RESERVED_WORD = {FLOAT}|{WHILE}|{BOOL}|{CONTINUE}|{FALSE}|{TRUE}|{VOID}|{PRINT}|{BREAK}|{CHAR}|{CLASS}|{RETURN}|{INT}|{READ}|{ELSE}|{CONST}|{IF}
 
