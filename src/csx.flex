@@ -126,7 +126,8 @@ BLOCKCOMMENT = ##((#[^#])|[^#])*#?##
 SINGLELINECOMMENT = [/][/].*[\n\r]?
 
 DIGIT=[0-9]
-STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\|" ")*\"		// to be fixed
+STRLIT = \"((\\[\\\"rnt])|[\040!#-\[\]-~])*\"
+RUNSTRLIT = \"((\\[\\\"rnt]*)|[\040!#-\[\]-~])*
 IDENTIFIER = ([a-zA-Z][_0-9]?)+
 FLOAT = [fF][lL][oO][aA][tT]
 WHILE = [wW][hH][iI][lL][eE]
@@ -140,8 +141,10 @@ IF = [iI][fF]
 
 BREAK = [Bb][Rr][Ee][Aa][Kk]
 CHAR = [Cc][Hh][Aa][Rr]
+NEWLINE = \n|(\r\n)
 
-CHARLIT = [']([a-zA-Z]|([\\][nNtTrR\'\"\\]))[']
+CHARLIT = ['](([\\][ntr\'\"\\])|[\040-&(\[\]-~])[']
+RUNCHARLIT = ['](([\\][ntr\'\"\\])|[\040-&(\[\]-~])*
 RETURN = [Rr][Ee][Tt][Uu][Rr][Nn]
 CLASS = [Cc][Ll][Aa][Ss][Ss]
 INT = [Ii][Nn][Tt]
@@ -295,12 +298,6 @@ Tokens for the CSX language are defined here using regular expressions
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.LT, new CSXToken(Pos));
-}
-
-"\'"
-{
-	Pos.setpos();
-	Pos.col += yytext().length();
 }
 
 "*"
@@ -465,6 +462,16 @@ Tokens for the CSX language are defined here using regular expressions
 			new CSXCharLitToken(parsedChar, Pos));
 }
 
+{RUNCHARLIT}
+{	
+	Pos.setpos();
+	
+	String parsed = yytext();
+	Pos.col += parsed.length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Runaway character found: " + parsed, Pos));
+}
+
 ([~]?{DIGIT}+\.{DIGIT}*)|([~]?{DIGIT}*\.{DIGIT}+)
 {
 	Pos.setpos();
@@ -509,13 +516,23 @@ Tokens for the CSX language are defined here using regular expressions
 	}
 }
 
-{STRLIT}+
+{STRLIT}
 {
 	Pos.setpos();
 	Pos.col += yytext().length();
 
 	return new Symbol(sym.STRLIT,
 			new CSXStringLitToken(yytext(), Pos));
+}
+
+{RUNSTRLIT}
+{
+	Pos.setpos();
+	
+	String parsed = yytext();
+	Pos.col += parsed.length();
+	return new Symbol(sym.error,
+			new CSXErrorToken("Runaway string found: " + parsed, Pos));
 }
 
 " "
@@ -532,7 +549,7 @@ Tokens for the CSX language are defined here using regular expressions
     Pos.col += 1;
 
 }
-\n|(\r\n)
+{NEWLINE}
 {
 	yybegin(YYINITIAL);
 	Pos.setpos();
