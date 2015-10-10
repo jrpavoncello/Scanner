@@ -140,6 +140,7 @@ RUNSTRLIT = \"((\\[\\\"rnt]*)|[\040!#-\[\]-~])*
 IDENTIFIER = (([a-zA-Z][_0-9]?)+([a-zA-Z]?[_0-9])*)+
 ILLEGALIDENTIFIER = ((_([0-9]*[a-zA-Z]+[_0-9]?)+[_0-9]*)|([0-9]+[a-zA-Z]+[_0-9]?)+[_0-9]*)
 
+
 FLOAT = [fF][lL][oO][aA][tT]
 WHILE = [wW][hH][iI][lL][eE]
 BOOL = [bB][oO][oO][lL]
@@ -154,8 +155,8 @@ BREAK = [Bb][Rr][Ee][Aa][Kk]
 CHAR = [Cc][Hh][Aa][Rr]
 NEWLINE = \n|(\r\n)
 
-CHARLIT = [']([@?+*.,;]|[0-9]|([\\][ntr\'\"\\])|[\040-&(\[\]-~])[']
-RUNCHARLIT = ['](([\\][ntr\'\"\\])|[\040-&(\[\]-~])*
+CHARLIT = ['](([\\][ntr\'\"\\])|[\040-&(-\[\]-~])[']
+RUNCHARLIT = ['](([\\][ntr\'\"\\])|[\040-&(-\[\]-~])*
 RETURN = [Rr][Ee][Tt][Uu][Rr][Nn]
 CLASS = [Cc][Ll][Aa][Ss][Ss]
 INT = [Ii][Nn][Tt]
