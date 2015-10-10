@@ -138,8 +138,8 @@ STRLIT = \"((\\[\\\"rnt])|[\040!#-\[\]-~])*\"
 RUNSTRLIT = \"((\\[\\\"rnt]*)|[\040!#-\[\]-~])*
 STRLIT = \"([^\" \\ ]|\\n|\\t|\\\"|\\\\|" ")*\"		// to be fixed
 
-IDENTIFIER = ([a-zA-Z][_0-9]?)+
-ILLEGALIDENTIFIER = (_([0-9]*[a-zA-Z]+[_0-9]?)+)|([0-9]*[a-zA-Z]+[_0-9]?)
+IDENTIFIER = ([a-zA-Z][_0-9]?)+(_0-9)*
+ILLEGALIDENTIFIER = _?([0-9]*[a-zA-Z]+[_0-9]?)+[_0-9]*
 
 FLOAT = [fF][lL][oO][aA][tT]
 WHILE = [wW][hH][iI][lL][eE]
