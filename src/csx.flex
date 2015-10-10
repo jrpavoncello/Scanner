@@ -1,3 +1,4 @@
+//Returned when reserved words, operators, or anything that we only care about what they are with no context are encountered
 class CSXToken
 {
 	int linenum;
@@ -23,6 +24,7 @@ class CSXToken
 
 }
 
+//Returned when integer literals are encountered so that we can display the intValue in P2
 class CSXIntLitToken extends CSXToken
 {
 	int intValue;
@@ -33,6 +35,7 @@ class CSXIntLitToken extends CSXToken
 	}
 }
 
+//Returned when float literals are encountered so that we can display the floatValue in P2
 class CSXFloatLitToken extends CSXToken
 {
 	float floatValue;
@@ -43,6 +46,7 @@ class CSXFloatLitToken extends CSXToken
 	}
 }
 
+//Returned when indentifier tokens are encountered so that we can display the name of the identifier in P2
 class CSXIdentifierToken extends CSXToken
 {
 	String identifierValue;
@@ -54,6 +58,8 @@ class CSXIdentifierToken extends CSXToken
 
 }
 
+//Returned when character literal are encountered so that we can display the charValue in P2
+//This may look odd when displayed in the case of escaped characters, as we display them as is
 class CSXCharLitToken extends CSXToken
 {
 	char charValue;
@@ -64,6 +70,7 @@ class CSXCharLitToken extends CSXToken
 	}
 }
 
+//Returned when string literal are encountered so that we can display the stringValue in P2
 class CSXStringLitToken extends CSXToken
 {
 	String stringValue;
@@ -74,6 +81,7 @@ class CSXStringLitToken extends CSXToken
 	}
 }
 
+//Returned when any errors are encountered so that we can display the error message in P2
 class CSXErrorToken extends CSXToken
 {
 	String error;
@@ -159,11 +167,12 @@ CONST = [Cc][Oo][Nn][Ss][Tt]
 RESERVED_WORD = {FLOAT}|{WHILE}|{BOOL}|{CONTINUE}|{FALSE}|{TRUE}|{VOID}|{PRINT}|{BREAK}|{CHAR}|{CLASS}|{RETURN}|{INT}|{READ}|{ELSE}|{CONST}|{IF}
 
 %states FoundIdentifier
-%xstates FoundIncOrDec, FoundIdentifierMatch
+%xstates FoundIdentifierMatch
 
 %type Symbol
 
 %eofval{
+	//When jFlex see the EOF token, return back an EOF token so we can stop scanning
 	return new Symbol(sym.EOF, new CSXToken(0,0));
 %eofval}
 
@@ -178,6 +187,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "||"
 {
+	// Match || (boolean or) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.COR,
@@ -186,6 +197,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "&&"
 {
+	// Match && (boolean and) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.CAND,
@@ -194,6 +207,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "=="
 {
+	// Match == (equality comparison) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.EQ,
@@ -202,6 +217,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "<="
 {
+	// Match <= (less than or equal to) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.LEQ, new CSXToken(Pos));
@@ -209,6 +226,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 ">="
 {
+	// Match >= (greater than or equal to) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.GEQ, new CSXToken(Pos));
@@ -216,6 +235,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "!="
 {
+	// Match != (not equal) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.NOTEQ, new CSXToken(Pos));
@@ -223,6 +244,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 <FoundIdentifier> "++"
 {
+	//If we find an identifier without a paired increment or decrement, go into the FoundIdentifier state
+	//so that we know we found an identifier that is eligible for a pair if one of those operators is scanned next
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -231,15 +254,19 @@ Tokens for the CSX language are defined here using regular expressions
 
 "++" / {RESERVED_WORD}
 {
+	//If we find an increment, and we look ahead and find a reserved word, return an error token so that we don't mistake
+	//the reserved word as an identifier in the rule below
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.error,
-			new CSXErrorToken("Found reserved word after \"++\" operator", Pos));
+			new CSXErrorToken("Found reserved word after \"++\" operator without a matching identifier", Pos));
 }
 
 "++" / {IDENTIFIER}
 {
+	//If we find an increment, and we lookahead and find an identifier, go into an exclusive state to indicate that we found 
+	//an identifier ahead and we don't want to match the regular identifier rule and be put into "FoundIdentifier" state
 	yybegin(FoundIdentifierMatch);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -248,6 +275,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "++"
 {
+	//If we find an increment any states to differentiate its context, such as a look ahead or that we
+	//found an identifier before it, then fail because it doesn't have a matching identifier
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -257,6 +286,7 @@ Tokens for the CSX language are defined here using regular expressions
 
 <FoundIdentifier> "--"
 {
+	// Duplicate approach as ++, see ++ for details
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -265,15 +295,17 @@ Tokens for the CSX language are defined here using regular expressions
 
 "--" / {RESERVED_WORD}
 {
+	// Duplicate approach as ++, see ++ for details
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.error,
-			new CSXErrorToken("Found reserved word after \"--\" operator", Pos));
+			new CSXErrorToken("Found reserved word after \"--\" operator without a matching identifier", Pos));
 }
 
 "--" / {IDENTIFIER}
 {
+	// Duplicate approach as ++, see ++ for details
 	yybegin(FoundIdentifierMatch);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -282,6 +314,7 @@ Tokens for the CSX language are defined here using regular expressions
 
 "--"
 {
+	// Duplicate approach as ++, see ++ for details
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -291,6 +324,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 ">"
 {
+	// Match on > (greater than) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.GT, new CSXToken(Pos));
@@ -298,6 +333,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "<"
 {
+	// Match on < (less than) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.LT, new CSXToken(Pos));
@@ -305,6 +342,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "*"
 {
+	// Match on * (multiplication) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.TIMES, new CSXToken(Pos));
@@ -312,6 +351,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "="
 {
+	// Match on = (assignment) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.ASG, new CSXToken(Pos));
@@ -319,6 +360,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "+"
 {
+	// Match on + (addition) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.PLUS, new CSXToken(Pos));
@@ -326,6 +369,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "-"
 {
+	// Match on - (subtraction) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.MINUS, new CSXToken(Pos));
@@ -333,6 +378,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "!"
 {
+	// Match on ! (boolean not) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.NOT, new CSXToken(Pos));
@@ -340,6 +387,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 ";"
 {
+	// Match on ; (semicolon/statement termination)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.SEMI, new CSXToken(Pos));
@@ -347,6 +396,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 ":"
 {
+	// Match on : (colon/seperator)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.COLON, new CSXToken(Pos));
@@ -354,6 +405,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 ","
 {
+	// Match on , (comma/seperator)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.COMMA, new CSXToken(Pos));
@@ -361,6 +414,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "{"
 {
+	// Match on { (begin scope) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.LBRACKET, new CSXToken(Pos));
@@ -368,6 +423,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "}"
 {
+	// Match on } (close scope) operator
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.RBRACKET, new CSXToken(Pos));
@@ -375,6 +432,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "["
 {
+	// Match on [ (open bracket)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.LBRACE, new CSXToken(Pos));
@@ -382,6 +441,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "]"
 {
+	// Match on ] (closed bracket)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.RBRACE, new CSXToken(Pos));
@@ -389,6 +450,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "/"
 {
+	// Match on / (slash)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.SLASH, new CSXToken(Pos));
@@ -396,6 +459,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 "("
 {
+	// Match on ( (open parentheses)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.LPAREN, new CSXToken(Pos));
@@ -403,6 +468,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 ")"
 {
+	// Match on ) (close parentheses)
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.RPAREN, new CSXToken(Pos));
@@ -410,6 +477,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {SINGLELINECOMMENT}
 {
+	// Match on a single line comment, does not include the newline so no need to increment the row
+	yybegin(YYINITIAL);
 	String comment = yytext();
     System.out.println("Line Comment: " + comment);
     Pos.setpos();
@@ -418,8 +487,12 @@ Tokens for the CSX language are defined here using regular expressions
 
 {BLOCKCOMMENT}
 {
+	// Match on a block comment that can span multiple lines or just a single line
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	
+	// Parse all the scanned text for any newline characters, if found increment the line and reset the column
+	// If we don't find one, just increment the column
     int rowsSkipped = 0;
     String parseString = yytext();
 	for(int i = 0; i < parseString.length(); i++)
@@ -432,20 +505,27 @@ Tokens for the CSX language are defined here using regular expressions
 		}
 	}
 	
+	//Print out the comment for debug purposes
     System.out.println("Block Comment: " + parseString);
 }
 
 {CHARLIT}
 {
+	// Match any character literal
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	String charString = yytext();
 	Pos.col += charString.length();
 
+	//Find any escaped characters and parse them
 	char parsedChar;
 	switch(charString)
 	{
 		case "'\\n'":
 			parsedChar = '\n';
+			break;
+		case "'\\r'":
+			parsedChar = '\r';
 			break;
 		case "'\\t'":
 			parsedChar = '\t';
@@ -457,6 +537,7 @@ Tokens for the CSX language are defined here using regular expressions
 			parsedChar = '\'';
 			break;
 		default:
+			//If not an escaped character, just return the one character between the single quotes
 			parsedChar = charString.charAt(1);
 			break;
 	}
@@ -466,9 +547,13 @@ Tokens for the CSX language are defined here using regular expressions
 }
 
 {RUNCHARLIT}
-{	
+{
+	// Match any runaway character literals
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	
+	//Get text, increase column to length of text
+	//Rule does not include newline, so no line increment
 	String parsed = yytext();
 	Pos.col += parsed.length();
 	return new Symbol(sym.error,
@@ -477,14 +562,20 @@ Tokens for the CSX language are defined here using regular expressions
 
 ([~]?{DIGIT}+\.{DIGIT}*)|([~]?{DIGIT}*\.{DIGIT}+)
 {
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	String parsedString = yytext();
 	Pos.col += parsedString.length();
+	
+	//If a tilde was found in parse string, this is supposed to be a negative number.
+	//Replace the tilde with a java recognizable symbol for negation
 	parsedString = parsedString.replace('~', '-');
 	
+	//Float.Parse() will return back negative or positive infinity on overflow
     float parsedFloat = Float.parseFloat(parsedString);
     if(parsedFloat == Float.NEGATIVE_INFINITY || parsedFloat == Float.POSITIVE_INFINITY)
     {
+		//Print error, but return Float.MAX_VALUE
 		System.out.println("Float Overflow Error");
 
 		return new Symbol(sym.FLOATLIT,
@@ -492,6 +583,7 @@ Tokens for the CSX language are defined here using regular expressions
     }
     else
     {
+    	//No overflow? Return a FloatLitToken with the parsed float as the value
 		return new Symbol(sym.FLOATLIT,
 			new CSXFloatLitToken(parsedFloat, Pos));
 	}
@@ -499,18 +591,25 @@ Tokens for the CSX language are defined here using regular expressions
 
 [~]?{DIGIT}+
 {
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	
 	String parsedString = yytext();
 	Pos.col += parsedString.length();
+	
+	//Same idea as float, replace tilde with java recognizable negation symbol
 	parsedString = parsedString.replace('~', '-');
 
 	try{
+		//If Integer.parseInt() throws a number format exception, because our rule only finds
+		//a valid integer format, the exception must be due to an overflow error.
+		//If not, return an INTLITToken with that integer as the value
 		return new Symbol(sym.INTLIT,
 				new CSXIntLitToken(Integer.parseInt(parsedString), Pos));
 
 	} catch (NumberFormatException e) {
-
+		
+		//Print the error and return an IntLitToken with Integer.MAX_VALUE as the value
 		System.out.println("Overflow Error");
 		System.out.println(e.getMessage());
 
@@ -521,6 +620,7 @@ Tokens for the CSX language are defined here using regular expressions
 
 {STRLIT}
 {
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 
@@ -530,8 +630,10 @@ Tokens for the CSX language are defined here using regular expressions
 
 {RUNSTRLIT}
 {
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	
+	//Any runaway strings will not contain the newline, so no need to increment line.
 	String parsed = yytext();
 	Pos.col += parsed.length();
 	return new Symbol(sym.error,
@@ -540,6 +642,7 @@ Tokens for the CSX language are defined here using regular expressions
 
 " "
 {
+	//Space character
 	Pos.setpos();
 	yybegin(YYINITIAL);
 	Pos.col += 1;
@@ -547,6 +650,7 @@ Tokens for the CSX language are defined here using regular expressions
 
 \t
 {
+	//Tab non-printable character
 	Pos.setpos();
     yybegin(YYINITIAL);
     Pos.col += 1;
@@ -554,6 +658,7 @@ Tokens for the CSX language are defined here using regular expressions
 }
 {NEWLINE}
 {
+	//Newline non-printable character including \n and \r\n
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.line += 1;
@@ -562,6 +667,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {BREAK}
 {
+	//Reserved word BREAK, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_BREAK,
@@ -570,6 +677,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {CHAR}
 {
+	//Reserved word CHAR, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_CHAR,
@@ -579,6 +688,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {RETURN}
 {
+	//Reserved word RETURN, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_RETURN,
@@ -588,6 +699,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {CLASS}
 {
+	//Reserved word CLASS, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_CLASS,
@@ -597,6 +710,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {INT}
 {
+	//Reserved word INT, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_INT,
@@ -605,6 +720,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {READ}
 {
+	//Reserved word READ, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_READ,
@@ -613,6 +730,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {ELSE}
 {
+	//Reserved word ELSE, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_ELSE,
@@ -621,6 +740,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {CONST}
 {
+	//Reserved word CONST, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_CONST,
@@ -630,6 +751,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {FLOAT}
 {
+	//Reserved word FLOAT, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_FLOAT,
@@ -638,6 +761,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {WHILE}
 {
+	//Reserved word WHILE, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_WHILE,
@@ -646,6 +771,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {BOOL}
 {
+	//Reserved word BOOL, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_BOOL,
@@ -654,6 +781,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {CONTINUE}
 {
+	//Reserved word CONTINUE, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_CONTINUE,
@@ -662,6 +791,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {FALSE}
 {
+	//Reserved word FALSE, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_FALSE,
@@ -670,6 +801,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {TRUE}
 {
+	//Reserved word TRUE, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_TRUE,
@@ -678,6 +811,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {VOID}
 {
+	//Reserved word VOID, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_VOID,
@@ -686,6 +821,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {PRINT}
 {
+	//Reserved word PRINT, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_PRINT,
@@ -694,33 +831,17 @@ Tokens for the CSX language are defined here using regular expressions
 
 {IF}
 {
+	//Reserved word IF, case insensitive
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.rw_IF,
 			new CSXToken(Pos));
 }
 
-<FoundIncOrDec> {RESERVED_WORD}
-{
-	Pos.setpos();
-	Pos.col += yytext().length();
-	yybegin(YYINITIAL);
-	return new Symbol(sym.error,
-			new CSXErrorToken("Found reserved word '" +  yytext() + "' after an Increment or Decrement operator, expected an identifier.", Pos));
-}
-
-<FoundIncOrDec> {IDENTIFIER}
-{
-	yybegin(FoundIdentifier);
-	Pos.setpos();
-	Pos.col += yytext().length();
-
-	return new Symbol(sym.IDENTIFIER,
-			new CSXIdentifierToken(yytext(), Pos));
-}
-
 <FoundIdentifierMatch> {IDENTIFIER}
 {
+	//If we found an identifier match already 
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -731,6 +852,8 @@ Tokens for the CSX language are defined here using regular expressions
 
 {IDENTIFIER}
 {
+	//When we encounter an identifier with this rule, it means we didn't find any increment or decrement
+	//operators before it, so we will enter a state so that we don't error if one follows immediately after
 	yybegin(FoundIdentifier);
 	Pos.setpos();
 	Pos.col += yytext().length();
@@ -741,6 +864,9 @@ Tokens for the CSX language are defined here using regular expressions
 
 {ILLEGALIDENTIFIER}
 {
+	//When an identifier is not caught by the identifier rule above, but it is by this rule, then it must be close
+	//to an identifier, but start with a number or underscore
+	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
 	return new Symbol(sym.error,
@@ -749,6 +875,7 @@ Tokens for the CSX language are defined here using regular expressions
 
 [^\Z]
 {
+	//Catch anything not caught by any rules above except for EOF and return an error
 	yybegin(YYINITIAL);
 	Pos.setpos();
 	Pos.col += yytext().length();
