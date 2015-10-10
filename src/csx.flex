@@ -155,7 +155,6 @@ INT = [Ii][Nn][Tt]
 READ = [Rr][Ee][Aa][Dd]
 ELSE = [Ee][Ll][Ss][Ee]
 CONST = [Cc][Oo][Nn][Ss][Tt]
-FOR = 
 
 RESERVED_WORD = {FLOAT}|{WHILE}|{BOOL}|{CONTINUE}|{FALSE}|{TRUE}|{VOID}|{PRINT}|{BREAK}|{CHAR}|{CLASS}|{RETURN}|{INT}|{READ}|{ELSE}|{CONST}|{IF}
 
